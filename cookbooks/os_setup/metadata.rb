@@ -1,0 +1,7 @@
+name             'os_setup'
+maintainer       'YOUR_NAME'
+maintainer_email 'YOUR_EMAIL'
+license          'All rights reserved'
+description      'Installs/Configures os_setup'
+long_description 'Installs/Configures os_setup'
+version          '0.1.0'
