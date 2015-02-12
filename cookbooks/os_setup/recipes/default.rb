@@ -4,15 +4,19 @@
 #
 # Copyright (c) 2015 The Authors, All Rights Reserved.
 
-
+# install normal stuff
 %w{ 
-	google-chrome-stable vim gcc git gitk transmission 
-	libssl-dev libreadline-dev sqlite3 libsqlite3-dev
-	python3 python3-dev
+  vim gcc git gitk transmission curl
+  libssl-dev libreadline-dev sqlite3 libsqlite3-dev
+  python3 python3-dev
   }.each do |pkg|
   package pkg do
     action :install
   end
+end
+
+package "unity-lens-shopping" do
+  action :remove
 end
 
 remote_file "/tmp/sumlime_text3.deb" do
@@ -29,7 +33,52 @@ dpkg_package "sublime_text3" do
 end
 
 cookbook_file ".gitconfig" do
-	path "#{node['os_setup']['home_dir']}/.gitconfig"
-	action :create_if_missing
-	mode "0644"
+  path "#{node['os_setup']['home_dir']}/.gitconfig"
+  action :create_if_missing
+  mode "0644"
+end
+
+# annoying dependencies for chrome
+%w{ libindicator7 libappindicator1 }.each do |pkg|
+  package pkg do
+    action :install
+  end
+end
+
+bash "check chrome install" do
+  code "which google-chrome"
+  returns 1
+  not_if "which google-chrome"
+  notifies :create, "remote_file[/tmp/google-chrome-stable_current_amd64.deb]", :immediately
+  notifies :install, "dpkg_package[google-chrome]", :immediately
+end
+
+remote_file "/tmp/google-chrome-stable_current_amd64.deb" do
+  action :nothing
+  source "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
+  mode 0644
+end
+
+dpkg_package "google-chrome" do
+  action :nothing
+  source "/tmp/google-chrome-stable_current_amd64.deb"
+end
+
+bash "check monaco font" do
+  code "stat /usr/share/fonts/truetype/custom/Monaco_Linux.ttf"
+  returns 1
+  not_if "stat /usr/share/fonts/truetype/custom/Monaco_Linux.ttf"
+  notifies :create, "remote_file[/tmp/install-font-ubuntu.sh]", :immediately
+  notifies :run, "bash[install monaco font]", :immediately
+end
+
+remote_file "/tmp/install-font-ubuntu.sh" do
+  action :nothing
+  source "https://raw.github.com/cstrap/monaco-font/master/install-font-ubuntu.sh"
+  mode 0755
+end
+
+bash "install monaco font" do
+  action :nothing
+  code "/tmp/install-font-ubuntu.sh"
 end

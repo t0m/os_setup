@@ -1,1 +1,1 @@
-sudo chef-client -z -o os_setup -L debug
+sudo chef-client -z -o os_setup -l debug
