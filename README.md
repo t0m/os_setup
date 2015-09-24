@@ -1,7 +1,6 @@
-Ubuntu Quickstart
+Ubuntu Quickstart, run from fresh install:
 
 ```
-#from fresh install
 sudo apt-get install -y git
 git clone https://github.com/t0m/os_setup.git
 cd os_setup
