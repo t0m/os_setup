@@ -19,6 +19,10 @@ bash "disable stupid floaty scrollbars" do
   not_if "gsettings get com.canonical.desktop.interface scrollbar-mode | grep --silent normal"
 end
 
+directory "#{node['os_setup']['home_dir']}/.ssh" do
+  action :create
+end
+
 bash "make ssh key" do
   code "ssh-keygen -t rsa -N \"\" -f #{node['os_setup']['home_dir']}/.ssh/id_rsa"
   not_if "stat #{node['os_setup']['home_dir']}/.ssh/id_rsa"
@@ -58,6 +62,11 @@ end
 dpkg_package "sublime_text3" do
   source "/tmp/sumlime_text3.deb"
   action :nothing
+end
+
+directory "#{node['os_setup']['home_dir']}/.config/sublime-text-3/Packages/User/" do
+  action :create
+  recursive true
 end
 
 cookbook_file "Preferences.sublime-settings" do
